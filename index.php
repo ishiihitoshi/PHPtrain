@@ -1,4 +1,5 @@
 <?php
+require('../dbconnect.php');
 session_start();
 
 if (!empty($_POST)){
@@ -23,7 +24,17 @@ if (!empty($_POST)){
       $error['image'] = 'type';
     }
   }
-
+  //重複アカウントのチェック
+  if (empty($error)) {
+    $sql = sprintf('SELECT COUNT(*) AS cnt FROM members WHERE email="%s"',
+      mysqli_real_escape_string($db, $_POST['email'])
+      );
+    $record = mysqli_query($db, $sql) or die(mysqli_error($db));
+    $table  = mysqli_fetch_assoc($record);
+    if($table['cnt'] > 0){
+      $error['email'] ='duplicate';
+    }
+  }
   if(empty($error)){
     //画像をアップロードする
     $image=date('YmdHis').$_FILES['image']['name'];
@@ -34,6 +45,12 @@ if (!empty($_POST)){
     header('Location:check.php');
     exit();
   }
+}
+
+//書き直し
+if(@$_REQUEST['action'] == 'rewrite'){
+  $_POST = $_SESSION['join'];
+  $error['rewrite'] = true;
 }
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -60,6 +77,9 @@ if (!empty($_POST)){
       value="<?php echo htmlspecialchars(@$_POST['email'], ENT_QUOTES, 'UTF-8'); ?>"/>
     <?php if(@$error['email']=='blank'): ?>
     <p class ="error">*メールアドレスを入力してください</p>
+    <?php endif; ?>
+    <?php if(@$error['email']=='duplicate'): ?>
+    <p class ="error">*指定されたメールアドレスはすでに登録されています</p>
     <?php endif; ?>
     </dd>
 
