@@ -6,9 +6,9 @@ session_start();
 if(!empty($_POST)){
 	//ログインの処理
 	if($_POST['email'] !='' && $_POST['password']!=''){
-		$sql = sprintf('SELECT * FROM members WHERE email="%s' AND password="%s",
-			mysqli_real_escape_strings($db, $_POST['email']),
-			mysqli_real_escape_strings($db, sha1($_POST['password']))
+		$sql = sprintf('SELECT * FROM members WHERE email="%s" AND password="%s"',
+			mysqli_real_escape_string($db, $_POST['email']),
+			mysqli_real_escape_string($db, sha1($_POST['password']))
 			);
 		$record = mysqli_query($db, $sql) or die(mysqli_error($db));
 		if($table=mysqli_fetch_assoc($record)){
@@ -45,25 +45,25 @@ if(!empty($_POST)){
   	<dt>メールアドレス</dt>
   	<dd>
   		<input type="text" name="email" size="35" maxlength="255"
-  		value="<?php echo htmlspecialchars($_POST['email']); ?>" />
-  		<?php if($error['login'] == 'blank'): ?>
+  		value="<?php echo htmlspecialchars(@$_POST['email']); ?>" />
+  		<?php if(@$error['login'] == 'blank'): ?>
   		<p class="error">*メールアドレスとパスワードをご記入ください</p>
   		<?php endif; ?>
-  		<?php if($error['login'] == 'failed'): ?>
+  		<?php if(@$error['login'] == 'failed'): ?>
   		<p class="error">* ログインに失敗しました。正しくご記入ください。</p>
   		<?php endif; ?>
   	</dd>
   	<dt>パスワード</dt>
   	<dd>
   		<input type="password" name="password" size="35" maxlength="255"
-  		value="<?php echo htmlspecialchars($_POST['password']); ?>" />
+  		value="<?php echo htmlspecialchars(@$_POST['password']); ?>" />
   	</dd>
   	<dt>ログイン情報の記録</dt>
   	<dd>
   		<input id="save" type="checkbox" name="save" value="on"><label for="save">次回からは自動的にログインする</label>
   	</dd>
   </dl>
-  <div><input tye="submit" value="ログインする" /></div>
+  <div><input type="submit" value="ログインする" /></div>
 </form>
 
 </body>
