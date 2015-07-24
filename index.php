@@ -25,6 +25,7 @@ if (!empty($_POST)){
     }
   }
   //Gitの理解のためにコメントを入れる
+  // ブランチを入れました
   //重複アカウントのチェック
   if (empty($error)) {
     $sql = sprintf('SELECT COUNT(*) AS cnt FROM members WHERE email="%s"',
