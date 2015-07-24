@@ -3,29 +3,43 @@ require('dbconnect.php');
 
 session_start();
 
-if(!empty($_POST)){
-	//ログインの処理
-	if($_POST['email'] !='' && $_POST['password']!=''){
+if (@$_COOKIE['email'] != '') {
+	$_POST['email'] = $_COOKIE['email'];
+	$_POST['password'] = $_COOKIE['password'];
+	$_POST['save'] = 'on';
+}
+
+
+if (!empty($_POST)) {
+	// ログインの処理
+	if ($_POST['email'] != '' && $_POST['password'] != '') {
 		$sql = sprintf('SELECT * FROM members WHERE email="%s" AND password="%s"',
 			mysqli_real_escape_string($db, $_POST['email']),
 			mysqli_real_escape_string($db, sha1($_POST['password']))
-			);
-		$record = mysqli_query($db, $sql) or die(mysqli_error($db));
-		if($table=mysqli_fetch_assoc($record)){
-			//ログイン成功
+		);
+	$record = mysqli_query($db, $sql) or die(mysqli_error($db));
+		if ($table = mysqli_fetch_assoc($record)) {
+			// ログイン成功
 			$_SESSION['id'] = $table['id'];
 			$_SESSION['time'] = time();
-			header('Location: index.php');
-			exit();
-		}else{
+
+		// ログイン情報を記録する
+		if (@$_POST['save'] == 'on') {
+			setcookie('email', $_POST['email'], time()+60*60*24*14);
+			setcookie('password', $_POST['password'],
+			time()+60*60*24*14);
+		}
+
+		header('Location: index.php');
+		exit();
+		} else {
 			$error['login'] = 'failed';
 		}
-	}else{
-		$error['login']='blank';
+	} else {
+		$error['login'] = 'blank';
 	}
 }
 ?>
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

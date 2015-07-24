@@ -1,5 +1,5 @@
 <?php
-require('../dbconnect.php');
+require('dbconnect.php');
 session_start();
 
 if (!empty($_POST)){
@@ -24,6 +24,7 @@ if (!empty($_POST)){
       $error['image'] = 'type';
     }
   }
+  //Gitの理解のためにコメントを入れる
   //重複アカウントのチェック
   if (empty($error)) {
     $sql = sprintf('SELECT COUNT(*) AS cnt FROM members WHERE email="%s"',
